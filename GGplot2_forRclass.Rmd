@@ -23,17 +23,115 @@ When you click the **Knit** button a document will be generated that includes bo
 summary(cars)
 ```
 
-```{r Data}
-
-
+We can load in our own data just as before, titling the *code chunk* (here I called it "data") and if we don't want the code chunk to be printed out, we can add `echo = FALSE` to the header.
+```{r data, `echo = FALSE`}
+example_data <- read.csv(file = "./example_data.csv")
+summary(example_data)
 ```
 
-## Including Plots
+## GGplot2, or using similar syntax for a bunch of different plot types!
 
-You can also embed plots, for example:
+First, we are going to build the simplest of scatter plots
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r simple_plot}
+  ggplot(data = example_data, aes(x = Dam_Weight_g, y = Dam_Just_body))
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Now let's make our code easier to read!
+```{r plot2}
+example_data %>%
+  ggplot(aes(x = Dam_Weight_g, y = Dam_Just_body)) + 
+  geom_point()
+```
+We can get also add more features to the plot.
+```{r plot3}
+example_data %>%
+  ggplot(aes(x = Dam_Weight_g, y = Dam_Just_body)) + 
+  geom_point()+
+  geom_smooth()
+
+example_data %>%
+  ggplot(aes(x = Dam_Weight_g, y = Dam_Just_body, color = Experiment)) + 
+  geom_point()+
+  geom_smooth()
+```
+We can get fancier than this. Let's add some more categories to aesthetics
+```{r plot4}
+example_data %>%
+  ggplot(aes(x = Dam_Weight_g, y = Dam_Just_body, color = Cross_Type, shape = Experiment)) + 
+  geom_point()
+```
+
+Let's try another plot type, with categorical data
+```{r plot 5}
+example_data %>%
+  ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Experiment)) + 
+  geom_point()
+
+example_data %>%
+  ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Experiment)) + 
+  geom_violin()+
+  geom_quasirandom()+
+  geom_boxplot()
+```
+Let's keep on making our plot fancy! You can change the background and gridlines quickly by using themes, update the angle of labels, switch 
+
+```{r plot 6}
+example_data %>%
+  ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Experiment)) + 
+  geom_violin()+
+  geom_quasirandom()+
+  geom_boxplot(width=0.2, color = "black")+
+  theme_cowplot()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
+  
+```
+
+
+Facets for panels
+
+```{r plot 7}
+library(ggbeeswarm)
+
+example_data %>%
+  ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Experiment)) + 
+  geom_violin()+
+  geom_quasirandom()+
+  geom_boxplot(width=0.2, color = "black")+
+  theme(legend.position="none", axis.text.x = element_text(angle = 45))+
+  facet_wrap(Experiment ~ .)+
+  theme_cowplot()
+
+example_data %>%
+  ggplot(aes(x = Placenta_Weight_g, y = Embryo_weight_g, color = Cross_Type)) + 
+  geom_point()+
+  geom_smooth()+
+  facet_wrap(Experiment ~ .)+
+  theme_bw()
+  
+example_data %>%
+  ggplot(aes(x = Placenta_Weight_g, y = Embryo_weight_g, color = Cross_Type)) + 
+  geom_point()+
+  geom_smooth()+
+  facet_wrap(Experiment ~ ., scales = "free")+
+  theme_minimal_grid()
+  
+  
+```
+
+```{r simple_plot}
+Plot <- example_data %>%
+  ggplot(aes(x = Together, y = Placenta.Weight..g., color  = Together_2))+
+  theme_bw()+
+  geom_hline(yintercept = mus_mean, linetype = "dotted")+
+  geom_hline(yintercept = spret_mean, linetype = "dashed")+
+  geom_hline(yintercept = nonhybrid_musspret_mean)+
+  geom_violin()+
+  geom_quasirandom(alpha = 0.7)+
+  geom_boxplot(color = "black", outlier.shape = NA, width = 0.15)+
+  scale_color_manual(values = c(mus_blue, musspret_purple, spret_red))+
+  theme(legend.position="none", axis.text.x = element_text(angle = 45))+
+  xlab("cross type")+
+  ylab("placenta weight (g)")
+```
+
