@@ -359,4 +359,15 @@ ridges <- example_data %>%
       ylab("cross")
 
 ridges
+
+
+
+```
+
+
+We can also make plots interactive, to see the identity of specific points
+```{r interactive}
+library(plotly)
+
+ggplotly(Placenta_plot)
 ```
