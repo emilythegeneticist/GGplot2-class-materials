@@ -146,10 +146,10 @@ We can also set colors manually if you have hex codes or color names:
 ```{r plot 9}
 
 spret_color <-"#CACACA"
-mus_color <- "#732E3D"
+mus_color <- "#949494"
 dom_color <-"#535360"
-mus_dom_color <-"#A59DBE"
-mus_spret_color <-"#785AA3"
+mus_dom_color <-"#74b3ce"
+mus_spret_color <-"#94C973"
 
 example_data %>%
   mutate(Cross_Type = fct_relevel(Cross_Type, 
@@ -161,7 +161,7 @@ example_data %>%
             "PP.LL", "LL.PP", 
             "CC.LL", "LL.CC",
             "PP.TF", "TF.PP")) %>%
-  ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Experiment)) + 
+  ggplot(aes(x = Cross_Type, y = Placenta_Weight_g, color = Experiment)) + 
   geom_violin()+
   geom_quasirandom()+
   geom_boxplot(width=0.2, color = "black")+
@@ -329,4 +329,34 @@ Placenta_plot <- example_data %>%
 
 plot_grid(Embryo_plot, Placenta_plot, ncol = 2, labels = c("A","B"))
 ```
+GGplot2 can make so many more things!!!!
 
+```{r ridges}
+library(ggridges)
+
+ridges <- example_data %>% 
+   mutate(Cross_Type = fct_relevel(Cross_Type, 
+                                  "TF.FM", "FM.TF",
+                                  "CC.PP", "PP.CC", 
+                                  "WW.LL", "LL.WW", 
+                                  "PP.WW", "WW.PP", 
+                                  "CC.WW", "WW.CC", 
+                                  "PP.LL", "LL.PP", 
+                                  "CC.LL", "LL.CC",
+                                  "PP.TF", "TF.PP")) %>%
+   ggplot(aes(x = Placenta_Weight_g, y = Cross_Type, fill = Experiment)) +
+      geom_density_ridges(jittered_points = TRUE,
+                          position = position_points_jitter(width = 0.05, height = 0),
+                          point_shape = '|', 
+                          point_size = 3, 
+                          point_alpha = 1,
+                          alpha = 0.5) +
+      theme_ridges() + 
+      theme(legend.position = "none")+
+      #ggtitle("")+
+      theme_bw()+
+      xlab("placenta weight (g)")+
+      ylab("cross")
+
+ridges
+```
