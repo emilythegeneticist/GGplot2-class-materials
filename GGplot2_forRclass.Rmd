@@ -64,6 +64,8 @@ example_data %>%
 
 Let's try another plot type, with categorical data
 ```{r plot 5}
+library(beeswarm)
+
 example_data %>%
   ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Experiment)) + 
   geom_point()
@@ -74,7 +76,8 @@ example_data %>%
   geom_quasirandom()+
   geom_boxplot()
 ```
-Let's keep on making our plot fancy! You can change the background and gridlines quickly by using themes, update the angle of labels, switch 
+
+Let's keep on making our plot fancy! You can change the background and gridlines quickly by using themes, update the angle of labels, switch the axis titles, etc.
 
 ```{r plot 6}
 example_data %>%
@@ -83,55 +86,247 @@ example_data %>%
   geom_quasirandom()+
   geom_boxplot(width=0.2, color = "black")+
   theme_cowplot()+
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
-  
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))+
+  ylab("embryo weight (g)")+
+  xlab("cross")
 ```
 
-
-Facets for panels
-
+This is nice, but our variables aren't ordered in our graph in a meaningful way. Let's fix that!
 ```{r plot 7}
-library(ggbeeswarm)
+library(forcats)
 
 example_data %>%
+  mutate(Cross_Type = fct_relevel(Cross_Type, 
+            "TF.FM", "FM.TF",
+            "CC.PP", "PP.CC", 
+            "WW.LL", "LL.WW", 
+            "PP.WW", "WW.PP", 
+            "CC.WW", "WW.CC", 
+            "PP.LL", "LL.PP", 
+            "CC.LL", "LL.CC",
+            "PP.TF", "TF.PP")) %>%
   ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Experiment)) + 
   geom_violin()+
   geom_quasirandom()+
   geom_boxplot(width=0.2, color = "black")+
-  theme(legend.position="none", axis.text.x = element_text(angle = 45))+
-  facet_wrap(Experiment ~ .)+
-  theme_cowplot()
-
-example_data %>%
-  ggplot(aes(x = Placenta_Weight_g, y = Embryo_weight_g, color = Cross_Type)) + 
-  geom_point()+
-  geom_smooth()+
-  facet_wrap(Experiment ~ .)+
-  theme_bw()
-  
-example_data %>%
-  ggplot(aes(x = Placenta_Weight_g, y = Embryo_weight_g, color = Cross_Type)) + 
-  geom_point()+
-  geom_smooth()+
-  facet_wrap(Experiment ~ ., scales = "free")+
-  theme_minimal_grid()
+  theme_cowplot()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))+
+  ylab("embryo weight (g)")+
+  xlab("cross")
   
   
 ```
 
-```{r simple_plot}
-Plot <- example_data %>%
-  ggplot(aes(x = Together, y = Placenta.Weight..g., color  = Together_2))+
-  theme_bw()+
-  geom_hline(yintercept = mus_mean, linetype = "dotted")+
-  geom_hline(yintercept = spret_mean, linetype = "dashed")+
-  geom_hline(yintercept = nonhybrid_musspret_mean)+
+Ugh, these colors tho. Lets try some other color options! R color brewer
+
+```{r plot 8}
+example_data %>%
+  mutate(Cross_Type = fct_relevel(Cross_Type, 
+            "TF.FM", "FM.TF",
+            "CC.PP", "PP.CC", 
+            "WW.LL", "LL.WW", 
+            "PP.WW", "WW.PP", 
+            "CC.WW", "WW.CC", 
+            "PP.LL", "LL.PP", 
+            "CC.LL", "LL.CC",
+            "PP.TF", "TF.PP")) %>%
+  ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Experiment)) + 
   geom_violin()+
-  geom_quasirandom(alpha = 0.7)+
-  geom_boxplot(color = "black", outlier.shape = NA, width = 0.15)+
-  scale_color_manual(values = c(mus_blue, musspret_purple, spret_red))+
-  theme(legend.position="none", axis.text.x = element_text(angle = 45))+
-  xlab("cross type")+
-  ylab("placenta weight (g)")
+  geom_quasirandom()+
+  geom_boxplot(width=0.2, color = "black")+
+  theme_cowplot()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))+
+  ylab("embryo weight (g)")+
+  xlab("cross")+
+  scale_color_brewer(palette = "Dark2")
+```
+
+We can also set colors manually if you have hex codes or color names:
+
+```{r plot 9}
+
+spret_color <-"#CACACA"
+mus_color <- "#732E3D"
+dom_color <-"#535360"
+mus_dom_color <-"#A59DBE"
+mus_spret_color <-"#785AA3"
+
+example_data %>%
+  mutate(Cross_Type = fct_relevel(Cross_Type, 
+            "TF.FM", "FM.TF",
+            "CC.PP", "PP.CC", 
+            "WW.LL", "LL.WW", 
+            "PP.WW", "WW.PP", 
+            "CC.WW", "WW.CC", 
+            "PP.LL", "LL.PP", 
+            "CC.LL", "LL.CC",
+            "PP.TF", "TF.PP")) %>%
+  ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Experiment)) + 
+  geom_violin()+
+  geom_quasirandom()+
+  geom_boxplot(width=0.2, color = "black")+
+  theme_cowplot()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))+
+  ylab("embryo weight (g)")+
+  xlab("cross")+
+  scale_color_manual(values = c(dom_color,
+                                mus_color,
+                                mus_dom_color,
+                                mus_spret_color,
+                                spret_color))
+```
+
+
+
+
+We can also use other packages with fun palettes, like Wes Anderson films or national parks
+```{r plot 10}
+library(wesanderson)
+library(NatParksPalettes)
+
+######Wes Anderson####
+
+pal <- wes_palette("FantasticFox1", n = 5)
+example_data %>%
+  mutate(Cross_Type = fct_relevel(Cross_Type, 
+            "TF.FM", "FM.TF",
+            "CC.PP", "PP.CC", 
+            "WW.LL", "LL.WW", 
+            "PP.WW", "WW.PP", 
+            "CC.WW", "WW.CC", 
+            "PP.LL", "LL.PP", 
+            "CC.LL", "LL.CC",
+            "PP.TF", "TF.PP")) %>%
+  ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Experiment)) + 
+  geom_violin()+
+  geom_quasirandom() +
+  geom_boxplot(width=0.2, color = "black")+
+  theme_cowplot()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))+
+  ylab("embryo weight (g)")+
+  xlab("cross")+
+  scale_color_manual(values = pal)
+
+######National Parks####
+
+pal <- natparks.pals("Yellowstone", n = 5)
+example_data %>%
+  mutate(Cross_Type = fct_relevel(Cross_Type, 
+            "TF.FM", "FM.TF",
+            "CC.PP", "PP.CC", 
+            "WW.LL", "LL.WW", 
+            "PP.WW", "WW.PP", 
+            "CC.WW", "WW.CC", 
+            "PP.LL", "LL.PP", 
+            "CC.LL", "LL.CC",
+            "PP.TF", "TF.PP")) %>%
+  ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Experiment)) + 
+  geom_violin()+
+  geom_quasirandom() +
+  geom_boxplot(width=0.2, color = "black")+
+  theme_cowplot()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))+
+  ylab("embryo weight (g)")+
+  xlab("cross")+
+  scale_color_manual(values = pal)
+```
+
+We can also color by continuous variables, either already plotted or in our data frame
+``` {r plot 11}
+######National Parks####
+example_data %>%
+  mutate(Cross_Type = fct_relevel(Cross_Type, 
+            "TF.FM", "FM.TF",
+            "CC.PP", "PP.CC", 
+            "WW.LL", "LL.WW", 
+            "PP.WW", "WW.PP", 
+            "CC.WW", "WW.CC", 
+            "PP.LL", "LL.PP", 
+            "CC.LL", "LL.CC",
+            "PP.TF", "TF.PP")) %>%
+  ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Placenta_Weight_g)) + 
+  geom_violin()+
+  geom_quasirandom() +
+  geom_boxplot(width=0.2, color = "black")+
+  theme_cowplot()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))+
+  ylab("embryo weight (g)")+
+  xlab("cross")+
+  scale_color_gradientn(colors=natparks.pals("Glacier"))
+```
+
+What if we want to highlight data groups in different panels? One way is to use facets
+
+```{r plot 12}
+pal <- natparks.pals("Yellowstone", n = 5)
+example_data %>%
+  mutate(Cross_Type = fct_relevel(Cross_Type, 
+            "TF.FM", "FM.TF",
+            "CC.PP", "PP.CC", 
+            "WW.LL", "LL.WW", 
+            "PP.WW", "WW.PP", 
+            "CC.WW", "WW.CC", 
+            "PP.LL", "LL.PP", 
+            "CC.LL", "LL.CC",
+            "PP.TF", "TF.PP")) %>%
+  ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Experiment)) + 
+  geom_violin()+
+  geom_quasirandom() +
+  geom_boxplot(width=0.2, color = "black")+
+  theme_cowplot()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))+
+  ylab("embryo weight (g)")+
+  xlab("cross")+
+  scale_color_manual(values = pal)+
+  facet_wrap(Experiment ~ ., scales = "free")
+  
+  
+```
+We can also save out plots as objects, and then further make our panels nice!
+
+```{r plot 12}
+pal <- natparks.pals("Yellowstone", n = 5)
+
+Embryo_plot <- example_data %>%
+                        mutate(Cross_Type = fct_relevel(Cross_Type, 
+                                  "TF.FM", "FM.TF",
+                                  "CC.PP", "PP.CC", 
+                                  "WW.LL", "LL.WW", 
+                                  "PP.WW", "WW.PP", 
+                                  "CC.WW", "WW.CC", 
+                                  "PP.LL", "LL.PP", 
+                                  "CC.LL", "LL.CC",
+                                  "PP.TF", "TF.PP")) %>%
+                        ggplot(aes(x = Cross_Type, y = Embryo_weight_g, color = Experiment)) + 
+                        geom_violin()+
+                        geom_quasirandom() +
+                        geom_boxplot(width=0.2, color = "black")+
+                        theme_cowplot()+
+                        theme(axis.text.x = element_text(angle = 45, vjust = 0.5), legend.position = "none")+
+                        ylab("embryo weight (g)")+
+                        xlab("cross")+
+                        scale_color_manual(values = pal)
+Placenta_plot <- example_data %>%
+                        mutate(Cross_Type = fct_relevel(Cross_Type, 
+                                  "TF.FM", "FM.TF",
+                                  "CC.PP", "PP.CC", 
+                                  "WW.LL", "LL.WW", 
+                                  "PP.WW", "WW.PP", 
+                                  "CC.WW", "WW.CC", 
+                                  "PP.LL", "LL.PP", 
+                                  "CC.LL", "LL.CC",
+                                  "PP.TF", "TF.PP")) %>%
+                        ggplot(aes(x = Cross_Type, y = Placenta_Weight_g, color = Experiment)) + 
+                        geom_violin()+
+                        geom_quasirandom() +
+                        geom_boxplot(width=0.2, color = "black")+
+                        theme_cowplot()+
+                        theme(axis.text.x = element_text(angle = 45, vjust = 0.5), legend.position = "none")+
+                        ylab("placenta weight (g)")+
+                        xlab("cross")+
+                        ylim(0,.4)+
+                        scale_color_manual(values = pal)
+
+plot_grid(Embryo_plot, Placenta_plot, ncol = 2, labels = c("A","B"))
 ```
 
