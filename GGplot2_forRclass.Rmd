@@ -11,6 +11,7 @@ library(tidyr)
 library(dplyr)
 library(ggplot2)
 library(cowplot)
+library(ggbeeswarm)
 ```
 
 ## R Markdown
@@ -24,7 +25,7 @@ summary(cars)
 ```
 
 We can load in our own data just as before, titling the *code chunk* (here I called it "data") and if we don't want the code chunk to be printed out, we can add `echo = FALSE` to the header.
-```{r data, `echo = FALSE`}
+```{r data, echo = FALSE}
 example_data <- read.csv(file = "./example_data.csv")
 summary(example_data)
 ```
@@ -284,7 +285,7 @@ example_data %>%
 ```
 We can also save out plots as objects, and then further make our panels nice!
 
-```{r plot 12}
+```{r plot 13}
 pal <- natparks.pals("Yellowstone", n = 5)
 
 Embryo_plot <- example_data %>%
